@@ -1,0 +1,219 @@
+package cn.edu.ncepu.clock.ui.home;
+
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.view.ContextMenu;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.SeekBar;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.WorkManager;
+
+import java.util.ArrayList;
+import java.util.Date;
+
+import cn.edu.ncepu.clock.AlarmReceiver;
+import cn.edu.ncepu.clock.model.ClockDate;
+import cn.edu.ncepu.clock.R;
+import cn.edu.ncepu.clock.model.SingleClockDate;
+import cn.edu.ncepu.clock.databinding.FragmentHomeBinding;
+
+public class HomeFragment extends Fragment
+{
+	private SeekBar seekBar;
+	private RecyclerView recyclerView;
+	private ArrayList<SingleClockDate> dates;
+	private FragmentHomeBinding binding;
+	private ClockAdapter adapter;
+	public void updateUI()
+	{
+		dates=ClockDate.getClockDate(getContext()).getDates();
+		if(null == adapter)
+		{
+			adapter = new ClockAdapter();
+		}
+		recyclerView.setAdapter(adapter);
+	}
+	@Override
+	public void onCreate(@Nullable Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+	}
+	
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	{
+		HomeViewModel homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+		binding = FragmentHomeBinding.inflate(inflater, container, false);
+		View root = binding.getRoot();
+		recyclerView=root.findViewById(R.id.rv_clocks);
+		seekBar=root.findViewById(R.id.seekBar5);
+		recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+		recyclerView.setLongClickable(true);
+		registerForContextMenu(recyclerView);
+		updateUI();
+		if(!dates.isEmpty())
+		{
+			long maxTimesRadio = dates.get(0).getDate().getTime() - new Date().getTime();
+			seekBar.setMax((int)maxTimesRadio);
+			Handler handler = new Handler();
+			Runnable runnable = new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					if (!dates.isEmpty())
+					{
+						long seconds=dates.get(0).getDate().getTime()- new Date().getTime();
+						if(seconds>=0)
+						{
+							seekBar.setProgress(seekBar.getMax()-(int)(seconds));
+							handler.postDelayed(this,10);
+						}
+						else
+						{
+							int pp=ClockDate.getClockDate(getContext()).getFirstUnUsefulDatePosition();
+							if(pp!=1)
+							{
+								dates=ClockDate.getClockDate(getContext()).getDates();
+								adapter.notifyItemMoved(0,pp-1);
+								seekBar.setMax((int)(dates.get(0).getDate().getTime() - new Date().getTime()));
+								handler.postDelayed(this,10);
+							}
+						}
+					}
+				}
+			};
+			handler.postDelayed(runnable,0);
+		}
+		//homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+		return root;
+	}
+	private class ViewHolder extends RecyclerView.ViewHolder
+	{
+		private final TextView tvClock,tvTime,tvTheme;
+		public ViewHolder(@NonNull View itemView)
+		{
+			super(itemView);
+			tvClock=itemView.findViewById(R.id.tv_clock);
+			tvTime=itemView.findViewById(R.id.tv_time);
+			tvTheme=itemView.findViewById(R.id.tv_theme);
+		}
+		public void bind(SingleClockDate date)
+		{
+			tvTheme.setText(date.getTheme());
+			tvClock.setText(String.format("%d年%d月%d日%d时%d分 响铃", date.getDate().getYear()+1900, date.getDate().getMonth()+1, date.getDate().getDate(), date.getDate().getHours(), date.getDate().getMinutes()));
+			Handler handler=new Handler();
+			Runnable runnable=new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					long seconds = date.getDate().getTime()/1000-new Date().getTime()/1000;
+					if(seconds < 0)
+					{
+						tvTime.setText("时间已过");
+					}
+					else
+					{
+						long minutes = seconds / 60;
+						long hours = minutes / 60;
+						long days = hours / 24;
+						tvTime.setText(String.format("还有%d天%d时%d分%d秒",days, hours%24, minutes%60, seconds%60));
+						handler.postDelayed(this,1000);
+					}
+				}
+			};
+			handler.postDelayed(runnable,0);
+		}
+	}
+	private class ClockAdapter extends RecyclerView.Adapter<ViewHolder>
+	{
+		private int position=0;
+		
+		public int getPosition()
+		{
+			return position;
+		}
+		public void setPosition(int position)
+		{
+			this.position = position;
+		}
+		@NonNull
+		@Override
+		public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
+		{
+			View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_item_view, parent, false);
+			return new ViewHolder(itemView);
+		}
+		
+		@Override
+		public void onBindViewHolder(@NonNull ViewHolder holder, int position)
+		{
+			holder.bind(dates.get(position));
+			holder.itemView.setOnLongClickListener(new View.OnLongClickListener()
+			{
+				@Override
+				public boolean onLongClick(View v)
+				{
+					setPosition(holder.getLayoutPosition());
+					return false;
+				}
+			});
+		}
+		@Override
+		public void onViewRecycled(@NonNull ViewHolder holder)
+		{
+			holder.itemView.setOnLongClickListener(null);
+			super.onViewRecycled(holder);
+		}
+		@Override
+		public int getItemCount()
+		{
+			return dates.size();
+		}
+	}
+	@Override
+	public void onDestroyView()
+	{
+		super.onDestroyView();
+		binding = null;
+	}
+	@Override
+	public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo)
+	{
+		requireActivity().getMenuInflater().inflate(R.menu.menu_delete,menu);
+		super.onCreateContextMenu(menu, v, menuInfo);
+	}
+	@Override
+	public boolean onContextItemSelected(@NonNull MenuItem item)
+	{
+		if(item.getItemId() == R.id.menu_delete)
+		{
+			WorkManager workManager = WorkManager.getInstance(requireContext());
+			workManager.cancelWorkById(dates.get(adapter.getPosition()).getId());
+			/*Intent alarmIntent = new Intent(getContext(), AlarmReceiver.class);
+			PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), (int)(dates.get(adapter.getPosition()).getDate().getTime()), alarmIntent, PendingIntent.FLAG_IMMUTABLE);
+			AlarmManager alarmManager = (AlarmManager) requireContext().getSystemService(Context.ALARM_SERVICE);
+			if (null != alarmManager)
+			{
+				alarmManager.cancel(pendingIntent);
+			}*/
+			ClockDate.getClockDate(getContext()).deleteDate(adapter.getPosition());
+			adapter.notifyItemRemoved(adapter.getPosition());
+		}
+		return super.onContextItemSelected(item);
+	}
+}
