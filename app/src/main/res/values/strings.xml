@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">clock</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="btn_date_text">Date</string>
+    <string name="btn_time_text">Time</string>
+    <string name="btn_sure_text">Add</string>
+    <string name="tv_set_theme_text">set theme</string>
+    <string name="menu_delete_text">delete</string>
+    <string name="todo">TODO</string>
+    <string name="fab_add_icon">Add</string>
+    <string name="fab_add_text">Add</string>
+</resources>
