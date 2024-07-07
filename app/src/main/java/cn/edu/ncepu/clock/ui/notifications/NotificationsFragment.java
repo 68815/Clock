@@ -1,7 +1,11 @@
 package cn.edu.ncepu.clock.ui.notifications;
 
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,18 +20,17 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.time.ZoneId;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
+import java.util.Objects;
 
-import cn.edu.ncepu.clock.ClockWork;
-import cn.edu.ncepu.clock.model.ClockDate;
+import cn.edu.ncepu.clock.AlarmReceiver;
+import cn.edu.ncepu.clock.ClockDate;
 import cn.edu.ncepu.clock.R;
-import cn.edu.ncepu.clock.model.SingleClockDate;
+import cn.edu.ncepu.clock.SingleClockDate;
 import cn.edu.ncepu.clock.databinding.FragmentNotificationsBinding;
 
 public class NotificationsFragment extends Fragment
@@ -105,20 +108,11 @@ public class NotificationsFragment extends Fragment
 			public void onClick(View v)
 			{
 				clockDate.addDate(new SingleClockDate(seclectDate,etTheme.getText().toString()));
-				int index=ClockDate.getClockDate(getContext()).getDates().size()-1;
-				long triggerAtMillis = seclectDate.getTime();
-				OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(ClockWork.class)
-						.setInitialDelay(triggerAtMillis-System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-						.setId(ClockDate.getClockDate(getContext()).getDates().get(index).getId())
-						.build();
-				
-				WorkManager.getInstance(requireContext())
-						.enqueue(workRequest);
-				/*ZoneId zoneId = ZoneId.systemDefault();
+				ZoneId zoneId = ZoneId.systemDefault();
 				Intent alarmIntent = new Intent(getContext(), AlarmReceiver.class);
 				PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), (int)seclectDate.getTime(), alarmIntent, PendingIntent.FLAG_IMMUTABLE);
 				AlarmManager alarmManager = (AlarmManager) requireContext().getSystemService(Context.ALARM_SERVICE);
-				alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, seclectDate.getTime(), pendingIntent);*/
+				alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, seclectDate.getTime(), pendingIntent);
 				Toast.makeText(getContext(),"successfully added",Toast.LENGTH_LONG).show();
 				//Snackbar.make(root, "successfully added", Snackbar.LENGTH_LONG).show();
 			}

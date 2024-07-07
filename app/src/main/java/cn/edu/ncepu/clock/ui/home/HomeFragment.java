@@ -20,15 +20,15 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.work.WorkManager;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 import cn.edu.ncepu.clock.AlarmReceiver;
-import cn.edu.ncepu.clock.model.ClockDate;
+import cn.edu.ncepu.clock.ClockDate;
 import cn.edu.ncepu.clock.R;
-import cn.edu.ncepu.clock.model.SingleClockDate;
+import cn.edu.ncepu.clock.SingleClockDate;
 import cn.edu.ncepu.clock.databinding.FragmentHomeBinding;
 
 public class HomeFragment extends Fragment
@@ -122,9 +122,10 @@ public class HomeFragment extends Fragment
 				public void run()
 				{
 					long seconds = date.getDate().getTime()/1000-new Date().getTime()/1000;
-					if(seconds < 0)
+					if(seconds<0)
 					{
-						tvTime.setText("时间已过");
+						tvClock.setText("时间已过");
+						tvTime.setText("此处为负数");
 					}
 					else
 					{
@@ -202,15 +203,13 @@ public class HomeFragment extends Fragment
 	{
 		if(item.getItemId() == R.id.menu_delete)
 		{
-			WorkManager workManager = WorkManager.getInstance(requireContext());
-			workManager.cancelWorkById(dates.get(adapter.getPosition()).getId());
-			/*Intent alarmIntent = new Intent(getContext(), AlarmReceiver.class);
+			Intent alarmIntent = new Intent(getContext(), AlarmReceiver.class);
 			PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), (int)(dates.get(adapter.getPosition()).getDate().getTime()), alarmIntent, PendingIntent.FLAG_IMMUTABLE);
 			AlarmManager alarmManager = (AlarmManager) requireContext().getSystemService(Context.ALARM_SERVICE);
 			if (null != alarmManager)
 			{
 				alarmManager.cancel(pendingIntent);
-			}*/
+			}
 			ClockDate.getClockDate(getContext()).deleteDate(adapter.getPosition());
 			adapter.notifyItemRemoved(adapter.getPosition());
 		}

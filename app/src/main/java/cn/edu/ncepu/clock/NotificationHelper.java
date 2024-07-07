@@ -40,6 +40,7 @@ public class NotificationHelper
 				.setContentTitle(title)
 				.setContentText(message)
 				.setPriority(NotificationCompat.PRIORITY_DEFAULT)
+				.setSound(soundUri,audioAttributes.getContentType())
 				.addAction(R.drawable.ic_home_black_24dp, "停止", stopPendingIntent);
 		
 		NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
