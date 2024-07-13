@@ -16,6 +16,12 @@
         android:gravity="center"
         android:text="@string/tv_set_theme_text" />
 
+    <EditText
+        android:id="@+id/etv_time_length"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="1" />
+
     <Button
         android:id="@+id/btn_set_date"
         android:layout_width="match_parent"

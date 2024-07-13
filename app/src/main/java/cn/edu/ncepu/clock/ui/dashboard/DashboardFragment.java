@@ -17,8 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-import cn.edu.ncepu.clock.model.HistoryDate;
 import cn.edu.ncepu.clock.R;
+import cn.edu.ncepu.clock.model.ClockDate;
 import cn.edu.ncepu.clock.model.SingleClockDate;
 import cn.edu.ncepu.clock.databinding.FragmentDashboardBinding;
 
@@ -30,7 +30,7 @@ public class DashboardFragment extends Fragment
 	private DashboardFragment.HistoryAdapter adapter;
 	public void updateUI()
 	{
-		dates= HistoryDate.getHistoryDate(getContext()).getDates();
+		dates= ClockDate.getClockDate(getContext()).getDates();
 		if(null == adapter)
 		{
 			adapter = new HistoryAdapter();
@@ -132,7 +132,7 @@ public class DashboardFragment extends Fragment
 	{
 		if(item.getItemId() == R.id.menu_delete)
 		{
-			HistoryDate.getHistoryDate(getContext()).deleteDate(adapter.getPosition());
+			ClockDate.getClockDate(getContext()).deleteDate(adapter.getPosition());
 			adapter.notifyItemRemoved(adapter.getPosition());
 		}
 		return super.onContextItemSelected(item);

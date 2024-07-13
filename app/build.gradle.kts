@@ -38,6 +38,7 @@ dependencies {
     implementation("com.j256.ormlite:ormlite-core:5.1")
     implementation("androidx.core:core:1.10.1")
     implementation("com.google.android.material:material:1.4.0")
+    implementation("androidx.work:work-runtime:2.7.1")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)

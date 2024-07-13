@@ -11,4 +11,6 @@
     <string name="todo">TODO</string>
     <string name="fab_add_icon">Add</string>
     <string name="fab_add_text">Add</string>
+    <string name="tv_time_length_text">length</string>
+    <string name="ett_tv_startTime_text">startTime</string>
 </resources>

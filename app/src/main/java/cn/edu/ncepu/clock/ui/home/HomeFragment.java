@@ -58,63 +58,74 @@ public class HomeFragment extends Fragment
 		HomeViewModel homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 		binding = FragmentHomeBinding.inflate(inflater, container, false);
 		View root = binding.getRoot();
-		recyclerView=root.findViewById(R.id.rv_clocks);
-		seekBar=root.findViewById(R.id.seekBar5);
+		recyclerView = root.findViewById(R.id.rv_clocks);
+		seekBar = root.findViewById(R.id.seekBar5);
 		recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 		recyclerView.setLongClickable(true);
 		registerForContextMenu(recyclerView);
 		updateUI();
 		if(!dates.isEmpty())
 		{
-			long maxTimesRadio = dates.get(0).getDate().getTime() - new Date().getTime();
-			seekBar.setMax((int)maxTimesRadio);
-			Handler handler = new Handler();
-			Runnable runnable = new Runnable()
+			seekBar.setMax((int)(dates.get(0).getDate().getTime() - new Date().getTime()));
+		}
+		int[] count = {0};
+		Handler handler = new Handler();
+		Runnable runnable = new Runnable()
+		{
+			@Override
+			public void run()
 			{
-				@Override
-				public void run()
+				if (!dates.isEmpty())
 				{
-					if (!dates.isEmpty())
+					long seconds = dates.get(0).getDate().getTime() - new Date().getTime();
+					if (seconds >= 0)
 					{
-						long seconds=dates.get(0).getDate().getTime()- new Date().getTime();
-						if(seconds>=0)
+						count[0] = 1;
+						seekBar.setProgress(seekBar.getMax() - (int) (seconds));
+						handler.postDelayed(this, 100);
+					}
+					else
+					{
+						if(count[0] == 1)
 						{
-							seekBar.setProgress(seekBar.getMax()-(int)(seconds));
-							handler.postDelayed(this,10);
-						}
-						else
-						{
-							int pp=ClockDate.getClockDate(getContext()).getFirstUnUsefulDatePosition();
-							if(pp!=1)
+							int pp = ClockDate.getClockDate(getContext()).getDates().size() - 1;
+							if (pp != 0)
 							{
-								dates=ClockDate.getClockDate(getContext()).getDates();
-								adapter.notifyItemMoved(0,pp-1);
-								seekBar.setMax((int)(dates.get(0).getDate().getTime() - new Date().getTime()));
-								handler.postDelayed(this,10);
+								long currentTime = new Date().getTime();
+								dates = ClockDate.getClockDate(getContext()).getDates();
+								adapter.notifyItemMoved(0, pp);
+								if (dates.get(0).getDate().getTime() > currentTime)
+								{
+									seekBar.setMax((int) (dates.get(0).getDate().getTime() - currentTime));
+									count[0] = 0;
+									handler.postDelayed(this, 100);
+								}
 							}
 						}
 					}
 				}
-			};
-			handler.postDelayed(runnable,0);
-		}
+			}
+		};
+		handler.postDelayed(runnable, 0);
 		//homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
 		return root;
 	}
 	private class ViewHolder extends RecyclerView.ViewHolder
 	{
-		private final TextView tvClock,tvTime,tvTheme;
+		private final TextView tvClock,tvTime,tvTheme,tvTimeRange;
 		public ViewHolder(@NonNull View itemView)
 		{
 			super(itemView);
 			tvClock=itemView.findViewById(R.id.tv_clock);
 			tvTime=itemView.findViewById(R.id.tv_time);
 			tvTheme=itemView.findViewById(R.id.tv_theme);
+			tvTimeRange=itemView.findViewById(R.id.tv_time_range);
 		}
 		public void bind(SingleClockDate date)
 		{
 			tvTheme.setText(date.getTheme());
 			tvClock.setText(String.format("%d年%d月%d日%d时%d分 响铃", date.getDate().getYear()+1900, date.getDate().getMonth()+1, date.getDate().getDate(), date.getDate().getHours(), date.getDate().getMinutes()));
+			tvTimeRange.setText(String.format("%d:%d~%d:%d",date.getStartHour(),date.getStartMinute(),date.getEndHour(),date.getEndMinute()));
 			Handler handler=new Handler();
 			Runnable runnable=new Runnable()
 			{
@@ -131,7 +142,12 @@ public class HomeFragment extends Fragment
 						long minutes = seconds / 60;
 						long hours = minutes / 60;
 						long days = hours / 24;
-						tvTime.setText(String.format("还有%d天%d时%d分%d秒",days, hours%24, minutes%60, seconds%60));
+						String timeStr = "还有" +
+								(days > 0 ? days + "天" : "") +
+								(hours % 24 > 0 ? hours % 24 + "时" : "") +
+								(minutes % 60 > 0 ? minutes % 60 + "分" : "") +
+								(seconds % 60 + "秒");
+						tvTime.setText(timeStr.trim());
 						handler.postDelayed(this,1000);
 					}
 				}
