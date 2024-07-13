@@ -14,7 +14,7 @@ public class DataDBHelper extends OrmLiteSqliteOpenHelper
 {
 	private static final String TAG="ClockDBHelper";
 	public static final String databaseName="clock.db";
-	static int databaseVersion=2;
+	static int databaseVersion=3;
 	private Dao<SingleClockDate,Integer> DataDao;
 	public DataDBHelper(Context context)
 	{

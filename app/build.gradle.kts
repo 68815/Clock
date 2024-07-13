@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "cn.edu.ncepu.clock"
-        minSdk = 26
+        minSdk = 29
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -38,6 +38,7 @@ dependencies {
     implementation("com.j256.ormlite:ormlite-core:5.1")
     implementation("androidx.core:core:1.10.1")
     implementation("com.google.android.material:material:1.4.0")
+    implementation("androidx.work:work-runtime:2.7.1")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
@@ -46,6 +47,7 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.core.animation)
+    implementation(libs.work.runtime)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

@@ -109,15 +109,4 @@ public class ClockDate
 		}
 		dates.remove(position);
 	}
-	public int getFirstUnUsefulDatePosition()
-	{
-		for(int i=1;i<dates.size();i++)
-		{
-			if(dates.get(i).getDate().getTime()<=new Date().getTime())
-			{
-				return i;
-			}
-		}
-		return dates.size();
-	}
 }

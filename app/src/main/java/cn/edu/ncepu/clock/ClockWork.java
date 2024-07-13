@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
+import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
@@ -28,21 +29,18 @@ public class ClockWork extends Worker
 	private Handler mainHandler;
 	private Context mContext;
 	private static final String CHANNEL_ID = "alarm_channel";
-	private static final String DEFAULT_SOUND_URI = "android.resource://cn.edu.ncepu.clock/" + R.raw.m1;
-	
 	public ClockWork(@NonNull Context context, @NonNull WorkerParameters workerParams)
 	{
 		super(context, workerParams);
 		mContext=context;
 		mainHandler = new Handler(Looper.getMainLooper());
 	}
-	
-	
 	@NonNull
 	@Override
 	public Result doWork()
 	{
-		mainHandler.post(new Runnable() {
+		mainHandler.post(new Runnable()
+		{
 			@Override
 			public void run() {
 				Toast.makeText(getApplicationContext(), "接下来你要去算竟了", Toast.LENGTH_LONG).show();
@@ -73,29 +71,28 @@ public class ClockWork extends Worker
 			}
 		});
 	}
-	private void createNotificationChannel() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-		{
-			NotificationChannel serviceChannel = new NotificationChannel(
-					CHANNEL_ID,
-					"Alarm Channel",
-					NotificationManager.IMPORTANCE_DEFAULT
-			);
-			NotificationManager manager = getApplicationContext().getSystemService(NotificationManager.class);
-			manager.createNotificationChannel(serviceChannel);
-		}
+	private void createNotificationChannel()
+	{
+		NotificationChannel serviceChannel = new NotificationChannel(
+				CHANNEL_ID,
+				"Alarm Channel",
+				NotificationManager.IMPORTANCE_DEFAULT
+		);
+		NotificationManager manager = getApplicationContext().getSystemService(NotificationManager.class);
+		manager.createNotificationChannel(serviceChannel);
 	}
 	
 	private void showNotification()
 	{
+		Data input=getInputData();
 		Intent stopIntent = new Intent(mContext, AlarmReceiver.class);
 		stopIntent.setAction("ACTION_STOP");
 		PendingIntent stopPendingIntent = PendingIntent.getBroadcast(mContext, 0, stopIntent, PendingIntent.FLAG_IMMUTABLE);
 		
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, CHANNEL_ID)
 				.setSmallIcon(R.drawable.ic_notifications_black_24dp)
-				.setContentTitle("111")
-				.setContentText("222")
+				.setContentTitle(input.getString("theme"))
+				.setContentText(String.format("共%.2f小时",input.getDouble("timeLength",-1)))
 				.setPriority(NotificationCompat.PRIORITY_DEFAULT)
 				.addAction(R.drawable.ic_home_black_24dp, "停止", stopPendingIntent);
 		

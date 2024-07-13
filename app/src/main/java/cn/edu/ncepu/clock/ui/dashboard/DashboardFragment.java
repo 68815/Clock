@@ -1,7 +1,6 @@
 package cn.edu.ncepu.clock.ui.dashboard;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -17,14 +16,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.Date;
 
-import cn.edu.ncepu.clock.ClockDate;
-import cn.edu.ncepu.clock.HistoryDate;
 import cn.edu.ncepu.clock.R;
-import cn.edu.ncepu.clock.SingleClockDate;
+import cn.edu.ncepu.clock.model.ClockDate;
+import cn.edu.ncepu.clock.model.SingleClockDate;
 import cn.edu.ncepu.clock.databinding.FragmentDashboardBinding;
-import cn.edu.ncepu.clock.ui.home.HomeFragment;
 
 public class DashboardFragment extends Fragment
 {
@@ -34,7 +30,7 @@ public class DashboardFragment extends Fragment
 	private DashboardFragment.HistoryAdapter adapter;
 	public void updateUI()
 	{
-		dates= HistoryDate.getHistoryDate(getContext()).getDates();
+		dates= ClockDate.getClockDate(getContext()).getDates();
 		if(null == adapter)
 		{
 			adapter = new HistoryAdapter();
@@ -136,7 +132,7 @@ public class DashboardFragment extends Fragment
 	{
 		if(item.getItemId() == R.id.menu_delete)
 		{
-			HistoryDate.getHistoryDate(getContext()).deleteDate(adapter.getPosition());
+			ClockDate.getClockDate(getContext()).deleteDate(adapter.getPosition());
 			adapter.notifyItemRemoved(adapter.getPosition());
 		}
 		return super.onContextItemSelected(item);
