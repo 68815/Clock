@@ -1,9 +1,5 @@
 package cn.edu.ncepu.clock.ui.home;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.ContextMenu;
@@ -25,7 +21,6 @@ import androidx.work.WorkManager;
 import java.util.ArrayList;
 import java.util.Date;
 
-import cn.edu.ncepu.clock.AlarmReceiver;
 import cn.edu.ncepu.clock.model.ClockDate;
 import cn.edu.ncepu.clock.R;
 import cn.edu.ncepu.clock.model.SingleClockDate;
