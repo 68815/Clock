@@ -37,7 +37,6 @@ public class DashboardFragment extends Fragment
 		}
 		recyclerView.setAdapter(adapter);
 	}
-	
 	public View onCreateView(@NonNull LayoutInflater inflater,
 	                         ViewGroup container, Bundle savedInstanceState)
 	{
