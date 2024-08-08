@@ -63,6 +63,10 @@ public class ClockDate
 					{
 						return 1;
 					}
+					else if(s1.getDate().getTime() < mirrorSeconds && s2.getDate().getTime() < mirrorSeconds)
+					{
+						return -1;
+					}
 					else
 					{
 						return s1.getDate().compareTo(s2.getDate());
@@ -74,6 +78,18 @@ public class ClockDate
 			Log.e("111","getCrimes");
 		}
 		return dates;
+	}
+	public int getNearbyDateClockCounts()
+	{
+		long currentMills = new Date().getTime();
+		for(int i=0;!dates.isEmpty() && i<dates.size();i++)
+		{
+			if(dates.get(i).getDate().getTime() + 24 * 60 * 60 * 1000 < currentMills)
+			{
+				return i;
+			}
+		}
+		return dates.size();
 	}
 	public void setDates(ArrayList<SingleClockDate> dates)
 	{

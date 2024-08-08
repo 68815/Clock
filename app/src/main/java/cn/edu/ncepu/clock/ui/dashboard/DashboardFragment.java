@@ -25,12 +25,18 @@ import cn.edu.ncepu.clock.databinding.FragmentDashboardBinding;
 public class DashboardFragment extends Fragment
 {
 	private RecyclerView recyclerView;
-	private ArrayList<SingleClockDate> dates;
+	private ArrayList<SingleClockDate> allDates,hisoryDates;
 	private FragmentDashboardBinding binding;
 	private DashboardFragment.HistoryAdapter adapter;
 	public void updateUI()
 	{
-		dates= ClockDate.getClockDate(getContext()).getDates();
+		hisoryDates = new ArrayList<SingleClockDate>();
+		allDates = ClockDate.getClockDate(getContext()).getDates();
+		int nearbyDateClockCounts = ClockDate.getClockDate(getContext()).getNearbyDateClockCounts();
+		for(int i=nearbyDateClockCounts ; i<allDates.size();i++)
+		{
+			hisoryDates.add( allDates.get(i));
+		}
 		if(null == adapter)
 		{
 			adapter = new HistoryAdapter();
@@ -55,17 +61,19 @@ public class DashboardFragment extends Fragment
 	
 	private class ViewHolder extends RecyclerView.ViewHolder
 	{
-		private final TextView tvDate,tvTheme;
+		private final TextView tvDate,tvTheme,tvTime;
 		public ViewHolder(@NonNull View itemView)
 		{
 			super(itemView);
 			tvDate=itemView.findViewById(R.id.tv_history_date);
 			tvTheme=itemView.findViewById(R.id.tv_history_theme);
+			tvTime=itemView.findViewById(R.id.tv_history_time);
 		}
 		public void bind(SingleClockDate date)
 		{
 			tvDate.setText(String.format("%d年%d月%d日%d时%d分", date.getDate().getYear()+1900, date.getDate().getMonth()+1, date.getDate().getDate(), date.getDate().getHours(), date.getDate().getMinutes()));
 			tvTheme.setText(date.getTheme());
+			tvTime.setText(String.format("%d:%d~%d:%d",date.getStartHour(),date.getStartMinute(),date.getEndHour(),date.getEndMinute()));
 		}
 	}
 	private class HistoryAdapter extends RecyclerView.Adapter<DashboardFragment.ViewHolder>
@@ -91,7 +99,7 @@ public class DashboardFragment extends Fragment
 		@Override
 		public void onBindViewHolder(@NonNull DashboardFragment.ViewHolder holder, int position)
 		{
-			holder.bind(dates.get(position));
+			holder.bind(hisoryDates.get(position));
 			holder.itemView.setOnLongClickListener(new View.OnLongClickListener()
 			{
 				@Override
@@ -111,7 +119,7 @@ public class DashboardFragment extends Fragment
 		@Override
 		public int getItemCount()
 		{
-			return dates.size();
+			return hisoryDates.size();
 		}
 	}
 	@Override

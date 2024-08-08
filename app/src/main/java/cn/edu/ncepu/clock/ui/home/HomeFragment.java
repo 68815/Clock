@@ -33,14 +33,16 @@ public class HomeFragment extends Fragment
 	private ArrayList<SingleClockDate> dates;
 	private FragmentHomeBinding binding;
 	private ClockAdapter adapter;
+	private int nearbyDateClockCounts;//时间久远的闹钟就不显示了
 	public void updateUI()
 	{
-		dates=ClockDate.getClockDate(getContext()).getDates();
+		dates = ClockDate.getClockDate(getContext()).getDates();
 		if(null == adapter)
 		{
 			adapter = new ClockAdapter();
 		}
 		recyclerView.setAdapter(adapter);
+		nearbyDateClockCounts = ClockDate.getClockDate(getContext()).getNearbyDateClockCounts();
 	}
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState)
@@ -83,7 +85,7 @@ public class HomeFragment extends Fragment
 					{
 						if(count[0] == 1)
 						{
-							int pp = ClockDate.getClockDate(getContext()).getDates().size() - 1;
+							int pp = ClockDate.getClockDate(getContext()).getNearbyDateClockCounts() - 1;
 							if (pp != 0)
 							{
 								long currentTime = new Date().getTime();
@@ -193,7 +195,7 @@ public class HomeFragment extends Fragment
 		@Override
 		public int getItemCount()
 		{
-			return dates.size();
+			return nearbyDateClockCounts;
 		}
 	}
 	@Override
