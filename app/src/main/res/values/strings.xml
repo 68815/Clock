@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">clock</string>
     <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_dashboard">history</string>
+    <string name="title_notifications">addClock</string>
     <string name="btn_date_text">Date</string>
     <string name="btn_time_text">Time</string>
     <string name="btn_sure_text">Add</string>

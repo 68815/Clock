@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import cn.edu.ncepu.clock.R;
 import cn.edu.ncepu.clock.model.ClockDate;
@@ -25,18 +26,26 @@ import cn.edu.ncepu.clock.databinding.FragmentDashboardBinding;
 public class DashboardFragment extends Fragment
 {
 	private RecyclerView recyclerView;
-	private ArrayList<SingleClockDate> allDates,hisoryDates;
+	private ArrayList<SingleClockDate> allDates,historyDates;
 	private FragmentDashboardBinding binding;
 	private DashboardFragment.HistoryAdapter adapter;
 	public void updateUI()
 	{
-		hisoryDates = new ArrayList<SingleClockDate>();
+		historyDates = new ArrayList<SingleClockDate>();
 		allDates = ClockDate.getClockDate(getContext()).getDates();
 		int nearbyDateClockCounts = ClockDate.getClockDate(getContext()).getNearbyDateClockCounts();
 		for(int i=nearbyDateClockCounts ; i<allDates.size();i++)
 		{
-			hisoryDates.add( allDates.get(i));
+			historyDates.add(allDates.get(i));
 		}
+		historyDates.sort(new Comparator<SingleClockDate>()
+		{
+			@Override
+			public int compare(SingleClockDate o1, SingleClockDate o2)
+			{
+				return -o1.getDate().compareTo(o2.getDate());
+			}
+		});
 		if(null == adapter)
 		{
 			adapter = new HistoryAdapter();
@@ -99,7 +108,7 @@ public class DashboardFragment extends Fragment
 		@Override
 		public void onBindViewHolder(@NonNull DashboardFragment.ViewHolder holder, int position)
 		{
-			holder.bind(hisoryDates.get(position));
+			holder.bind(historyDates.get(position));
 			holder.itemView.setOnLongClickListener(new View.OnLongClickListener()
 			{
 				@Override
@@ -119,7 +128,7 @@ public class DashboardFragment extends Fragment
 		@Override
 		public int getItemCount()
 		{
-			return hisoryDates.size();
+			return historyDates.size();
 		}
 	}
 	@Override
@@ -140,6 +149,7 @@ public class DashboardFragment extends Fragment
 		if(item.getItemId() == R.id.menu_delete)
 		{
 			ClockDate.getClockDate(getContext()).deleteDate(adapter.getPosition());
+			historyDates.remove(adapter.getPosition());
 			adapter.notifyItemRemoved(adapter.getPosition());
 		}
 		return super.onContextItemSelected(item);
